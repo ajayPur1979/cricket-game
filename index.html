@@ -5,6 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cricket 20-20</title>
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+<!-- ╔══════════════════════════════════════════════════════╗
+     ║  GOOGLE ANALYTICS GA4 — replace G-XXXXXXXXXX        ║
+     ║  1. Go to analytics.google.com                       ║
+     ║  2. Create property → Web → get your Measurement ID  ║
+     ║  3. Paste it below in both places                    ║
+     ╚══════════════════════════════════════════════════════╝ -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     VISITOR ANALYTICS — GoatCounter (free, no cookies, GDPR-safe)
+     
+     SETUP (one-time, takes 2 minutes):
+     1. Go to https://www.goatcounter.com  → Sign Up (free)
+     2. Enter your site URL (e.g. yourusername.github.io)
+     3. You get a unique code — e.g. "mycricketgame"
+     4. Replace YOUR_GOATCOUNTER_CODE below with that code
+     5. Push to GitHub — done. View stats at https://YOUR_CODE.goatcounter.com
+     ══════════════════════════════════════════════════════════= -->
+<script data-goatcounter="https://YOUR_GOATCOUNTER_CODE.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600&family=Rajdhani:wght@400;600;700&display=swap');
 :root{
@@ -43,6 +69,17 @@ body{background:var(--dark);font-family:'Rajdhani',sans-serif;color:var(--cream)
   font-size:.85rem;letter-spacing:12px;color:#4ab860;margin-top:.4rem;text-transform:uppercase;
   text-shadow:0 0 20px rgba(74,184,96,.4);
 }
+.visitor-count{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.18);
+  border-radius:20px;padding:.28rem .85rem;margin-top:.6rem;
+  font-family:'Rajdhani',sans-serif;font-size:.72rem;
+  color:rgba(245,240,224,.5);letter-spacing:1px;
+}
+.visitor-count .vc-num{
+  color:var(--gold);font-family:'Teko',sans-serif;
+  font-size:1.05rem;font-weight:600;letter-spacing:2px;
+}
 .menu-badge{
   display:inline-block;background:rgba(240,192,64,.12);border:1px solid rgba(240,192,64,.3);
   border-radius:20px;padding:.25rem 1rem;font-size:.72rem;letter-spacing:3px;color:var(--gold);
@@ -52,6 +89,21 @@ body{background:var(--dark);font-family:'Rajdhani',sans-serif;color:var(--cream)
   width:180px;height:2px;margin:1.2rem auto;
   background:linear-gradient(90deg,transparent,var(--gold),transparent);
 }
+/* Overs selector */
+.overs-row{display:flex;gap:.6rem;margin-top:.4rem;}
+.obtn{
+  flex:1;padding:.45rem .2rem;border:2px solid var(--glass-border);
+  background:var(--glass);color:rgba(245,240,224,.5);
+  font-family:'Teko',sans-serif;font-size:1.05rem;letter-spacing:2px;
+  cursor:pointer;border-radius:6px;transition:all .2s;
+}
+.obtn.sel{
+  background:var(--gold);color:#000;border-color:var(--gold);
+  font-weight:700;font-size:1.15rem;
+  box-shadow:0 0 0 3px rgba(240,192,64,.4),0 0 22px rgba(240,192,64,.6);
+  transform:translateY(-2px);
+}
+.obtn:hover:not(.sel){background:rgba(240,192,64,.12);border-color:rgba(240,192,64,.4);color:var(--gold);}
 .field{margin:.75rem 0;}
 .field label{display:block;font-size:.7rem;letter-spacing:4px;color:#4ab860;margin-bottom:.3rem;text-transform:uppercase;}
 .field input{
@@ -156,15 +208,18 @@ body{background:var(--dark);font-family:'Rajdhani',sans-serif;color:var(--cream)
 }
 .snd-btn:hover{border-color:var(--gold);color:var(--gold);}
 
-/* Canvas — fills remaining height */
+/* Canvas — maintains 16:10 aspect ratio, letterboxed */
 .canvas-wrap{
   position:relative;
   flex:1;
   overflow:hidden;
   background:#040d06;
   min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-#gc{display:block;width:100%;height:100%;object-fit:fill;}
+#gc{display:block;}
 
 /* Ball strip */
 .ostrip{
@@ -337,11 +392,25 @@ body{background:var(--dark);font-family:'Rajdhani',sans-serif;color:var(--cream)
 <div id="menu" class="screen active">
   <div class="menu-inner">
     <div class="gtitle">CRICKET</div>
-    <div class="gsub">20 · 20 Challenge</div>
+    <div class="gsub" id="gsub">20 · 20 Challenge</div>
     <div class="menu-badge">Dharamshala · HPCA Stadium</div>
+    <div class="visitor-count">
+      <span>👥</span>
+      <span>VISITORS</span>
+      <span class="vc-num" id="vcNum">—</span>
+    </div>
     <div class="divider"></div>
     <div class="field"><label>YOUR TEAM</label><input id="pName" value="India" maxlength="18"></div>
     <div class="field"><label>AI OPPONENT</label><input id="aName" value="Australia" maxlength="18"></div>
+    <div class="field">
+      <label>OVERS PER INNINGS</label>
+      <div class="overs-row">
+        <button class="obtn" id="o2"  onclick="setOvers(2)">2</button>
+        <button class="obtn" id="o5"  onclick="setOvers(5)">5</button>
+        <button class="obtn" id="o10" onclick="setOvers(10)">10</button>
+        <button class="obtn sel" id="o20" onclick="setOvers(20)">20</button>
+      </div>
+    </div>
     <div class="field">
       <label>TOSS — YOU CHOOSE TO</label>
       <div class="toss-row">
@@ -441,6 +510,35 @@ body{background:var(--dark);font-family:'Rajdhani',sans-serif;color:var(--cream)
 </div>
 
 <script>
+// ── Visitor counter (CountAPI) ───────────────────────────────
+// Free service at countapi.xyz — increments on every page load
+// Replace 'your-github-username.github.io' with your actual domain
+// after first deploy so counter is unique to your site.
+(function(){
+  const NS  = 'your-github-username.github.io';  // ← REPLACE with your GitHub Pages domain
+  const KEY = 'cricket-game-visitors';
+  fetch('https://api.countapi.xyz/hit/' + NS + '/' + KEY)
+    .then(r => r.json())
+    .then(data => {
+      const el = document.getElementById('vcNum');
+      if (el && data.value) {
+        // Animate count up from 0
+        const target = data.value;
+        const dur = 1200, steps = 40;
+        let step = 0;
+        const tick = setInterval(() => {
+          step++;
+          el.textContent = Math.round(target * (step/steps)).toLocaleString();
+          if (step >= steps) { el.textContent = target.toLocaleString(); clearInterval(tick); }
+        }, dur/steps);
+      }
+    })
+    .catch(() => {
+      const el = document.getElementById('vcNum');
+      if (el) el.textContent = '—';   // silent fail — counter just hides
+    });
+})();
+
 // ═══════════════════════════════════════════════════════════
 //  SKELETAL ANIMATION ENGINE
 //  Each figure = a skeleton: joints connected by limb segments.
@@ -451,12 +549,31 @@ const cv = document.getElementById('gc');
 const cx = cv.getContext('2d');
 let W, H, S; // canvas width/height, scale factor
 
+// ── Local visit counter (device-level, stored in localStorage) ──
+function initVisitCounter() {
+  try {
+    let count = parseInt(localStorage.getItem('ckt_visits') || '0') + 1;
+    localStorage.setItem('ckt_visits', count);
+    // Show briefly on the menu screen after load
+    const badge = document.createElement('div');
+    badge.style.cssText = 'position:fixed;bottom:12px;right:14px;font-family:monospace;font-size:.68rem;color:rgba(240,192,64,.45);z-index:1;pointer-events:none;';
+    badge.textContent = 'Visit #' + count + ' on this device';
+    document.body.appendChild(badge);
+    setTimeout(() => { badge.style.transition='opacity 1.5s'; badge.style.opacity='0'; setTimeout(()=>badge.remove(),1600); }, 4000);
+  } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', initVisitCounter);
+
 function resize() {
-  const wrap = cv.parentElement;
-  W = wrap.clientWidth  || 700;
-  H = wrap.clientHeight || Math.round(W * 0.55);
-  if (H < 180) H = Math.round(W * 0.55);  // fallback if not yet laid out
-  cv.width = W; cv.height = H;
+  // Measure from window directly — avoids stale clientWidth during DOM transitions
+  const topbarEl = document.getElementById('topbar');
+  const sidePanelEl = document.querySelector('.side-panel');
+  const topH   = topbarEl    ? topbarEl.offsetHeight    : 52;
+  const sideW  = sidePanelEl ? sidePanelEl.offsetWidth  : 148;
+  W = Math.max(window.innerWidth  - sideW, 200);
+  H = Math.max(window.innerHeight - topH,  200);
+  cv.width  = W;
+  cv.height = H;
   S = W / 700;
 }
 window.addEventListener('resize', () => { resize(); renderFrame(); });
@@ -702,8 +819,12 @@ function tickFielderCelebration() {
 // Phase 3: Death      overs 16-20 → boundary riders, yorker-length defence
 function getFieldPhase() {
   const ov = G && G.balls != null ? Math.floor(G.balls / 6) : 0;
-  if (ov < 6)  return 'powerplay';
-  if (ov < 15) return 'middle';
+  // Scale phases proportionally to OVERS
+  // Powerplay = first 30%, Middle = 30%-75%, Death = last 25%
+  const pp  = Math.max(1, Math.round(OVERS * 0.30));
+  const mid = Math.max(pp+1, Math.round(OVERS * 0.75));
+  if (ov < pp)  return 'powerplay';
+  if (ov < mid) return 'middle';
   return 'death';
 }
 
@@ -1389,10 +1510,10 @@ function renderFrame() {
   const CX=W/2, CY=H*.58;
   const batKit  = getBatKit();
   const bowKit  = getBowlKit();
-  // Keeper stands ~4 metres behind the north stumps
-  // North stumps top = pTop+S*16, bottom = pTop+S*34, batsman at pTop+S*38
-  // Keeper should be clearly north of the stumps:
-  const keeperY = CY - H*0.22 - S*55;  // keeper ~55 units north of pitch top = clearly behind stumps with visible gap
+  // Keeper stands just behind the north stumps (bail at pTop+S*16)
+  // Position feet ~S*10 north of stump bail = pTop + S*6
+  const pTop = CY - H*0.22;
+  const keeperY = pTop + S*4;  // just behind the top stumps bail
   drawKeeperSprite(CX, keeperY, batKit.helmet);
   // Non-striker (at far end) — drawn before striker so striker renders on top
   if(nonStrikerX != null)
@@ -1952,7 +2073,7 @@ function resetPositions() {
 // ═══════════════════════════════════════════════════════════
 //  GAME LOGIC
 // ═══════════════════════════════════════════════════════════
-const OVERS=20, WKTS=10;
+let OVERS=20, WKTS=10;  // OVERS is set by menu selector
 // Bowler types cycle each over: fast, fast, medium, spin, fast, medium, ...
 const BOWLER_TYPES = ['fast','fast','medium','spin','fast','medium','spin','fast'];
 let G={}, toss='bat', pTeam='India', aTeam='Australia', locked=false;
@@ -1973,6 +2094,14 @@ function getBowlKit()  { const pb=(G.inn===1&&G.pbf)||(G.inn===2&&!G.pbf); retur
 let currentBowlerType = 'fast';  // changes each over
 let overNotifPending = false;
 
+function setOvers(n){
+  OVERS=n;
+  document.getElementById('gsub').textContent=n+' · '+n+' Challenge';
+  [2,5,10,20].forEach(v=>{
+    const el=document.getElementById('o'+v);
+    if(el) el.classList.toggle('sel',v===n);
+  });
+}
 function setToss(c){toss=c;document.getElementById('tBat').classList.toggle('sel',c==='bat');document.getElementById('tBowl').classList.toggle('sel',c==='bowl');}
 
 function startGame(){
@@ -1981,23 +2110,26 @@ function startGame(){
   G={inn:1,pbf:toss==='bat',runs:0,wkts:0,balls:0,target:0,i1:{runs:0,wkts:0}};
   currentBowlerType = BOWLER_TYPES[0]; // always starts with fast
   showScreen('game');
-  resize();
-  buildFigures();
-  sceneReady=true;
-  stumpsFallen=false;
-  startLoop();
-  updateSB(); clearTrack(); updateLabels();
-  // Crowd ambience starts on first ball (after user gesture unlocks AudioContext)
-  if(toss==='bowl'){
-    // Player bowls first — AI bats first innings
-    setC('You are bowling! Pick your delivery.');
-    showBowlMode('SELECT YOUR DELIVERY');
-    setTimeout(()=>{ setBowlBtns(true); },400);
-  } else {
-    // Player bats first
-    setC('You are batting! Choose your shot.');
-    showBatMode('SELECT YOUR SHOT');
-  }
+  // Double-rAF ensures the game screen is fully laid out before we measure
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    resize();
+    buildFigures();
+    sceneReady = true;
+    stumpsFallen = false;
+    startLoop();
+    updateSB(); clearTrack(); updateLabels();
+    // Crowd ambience starts on first ball (after user gesture unlocks AudioContext)
+    if(toss==='bowl'){
+      // Player bowls first — AI bats first innings
+      setC('You are bowling! Pick your delivery.');
+      showBowlMode('SELECT YOUR DELIVERY');
+      setTimeout(()=>{ setBowlBtns(true); },400);
+    } else {
+      // Player bats first
+      setC('You are batting! Choose your shot.');
+      showBatMode('SELECT YOUR SHOT');
+    }
+  }));
 }
 
 function updateLabels(){
@@ -2073,7 +2205,7 @@ function pickFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 const dotC = () => pickFrom(['Defended back down the pitch.','Good length, no run.','Left alone outside off.','Pushed to mid-on, no run.','Dot ball — tight line.','No room to score.']);
 
 function resolveShot(t) {
-  const r = Math.random(), ov = 0|G.balls/6, death = ov >= 16, pp = ov < 6;
+  const r = Math.random(), ov = 0|G.balls/6, phase = getFieldPhase(), death = phase==='death', pp = phase==='powerplay';
   const mid = !death && !pp;
 
   const shots = {
@@ -2615,7 +2747,7 @@ function updateSB() {
   document.getElementById('tbScore').textContent  = `${G.runs}/${G.wkts}`;
   const co = 0|G.balls/6, bo = G.balls%6;
   const ov = co; // completed overs
-  const phLbl = ov < 6 ? ' [PP]' : ov < 15 ? ' [MID]' : ' [DEATH]';
+  const phLbl = getFieldPhase() === 'powerplay' ? ' [PP]' : getFieldPhase() === 'middle' ? ' [MID]' : ' [DEATH]';
   document.getElementById('tbOv').textContent = `${co}.${bo} ov · ${OVERS-co} left${phLbl}`;
   const rr = G.balls > 0 ? ((G.runs/G.balls)*6).toFixed(2) : '0.00';
   document.getElementById('tbRR').textContent     = `RR ${rr}`;
