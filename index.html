@@ -1009,8 +1009,8 @@ function playAnim(who, frames, cb) {
 
 function buildFigures() {
   const CX=W/2, CY=H*0.58;
-  const pTop = CY - H*0.22;
-  const pBot = CY - H*0.22 + H*0.44;
+  const pTop = CY - H*0.28;
+  const pBot = CY - H*0.28 + H*0.56;
   const northY = pTop + S*38;  // feet at base of stumps, body covers them
   const southY = pBot - S*38;  // south end — feet at stump base
   bowlerX  = CX + S*18;
@@ -1030,7 +1030,7 @@ function buildFigures() {
 //        For 2: both batsmen complete a full crossing.
 function animateRunning(runs, onDone) {
   if(!runs || runs < 1) { onDone && onDone(); return; }
-  const CX=W/2, CY=H*0.58, pTop=CY-H*0.22, pBot=CY-H*0.22+H*0.44;
+  const CX=W/2, CY=H*0.58, pTop=CY-H*0.28, pBot=CY-H*0.28+H*0.56;
   // Crease y-positions
   const northY = pTop + S*38;   // striker at north — feet at stump base
   const southY = pBot - S*38;   // non-striker at south — feet at stump base
@@ -1111,7 +1111,7 @@ function animateThrowback(res, onDone) {
   const type = res.type, runs = res.runs || 0;
   if (type === 'four' || type === 'six' || type === 'wkt') { onDone && onDone(); return; }
 
-  const CX=W/2, CY=H*0.58, pTop=CY-H*0.22, pBot=CY-H*0.22+H*0.44;
+  const CX=W/2, CY=H*0.58, pTop=CY-H*0.28, pBot=CY-H*0.28+H*0.56;
   const RX=W*0.46, RY=H*0.40;
 
   const stops = {
@@ -1269,7 +1269,7 @@ function drawBG() {
   cx.beginPath(); cx.ellipse(CX,CY,RX*0.45,RY*0.45,0,0,Math.PI*2); cx.stroke();
 
   // ── Pitch ────────────────────────────────────────────────
-  const pTop=CY-H*0.22, pitchW=S*48, pitchH=H*0.44;
+  const pTop=CY-H*0.28, pitchW=S*48, pitchH=H*0.56;
   const pitchG=cx.createLinearGradient(0,pTop,0,pTop+pitchH);
   pitchG.addColorStop(0,'#d4b870'); pitchG.addColorStop(0.5,'#c8a450'); pitchG.addColorStop(1,'#b89040');
   cx.fillStyle=pitchG;
@@ -1357,7 +1357,7 @@ function drawBG() {
 
 function drawStumps(fallen) {
   const CX=W/2, CY=H*0.58;
-  const pTop=CY-H*0.22, pitchH=H*0.44;
+  const pTop=CY-H*0.28, pitchH=H*0.56;
   const sh=S*18, sw=S*2.5, bail=S*1.6;
   const STUMP_COLOR = '#cc2200';
   const BAIL_COLOR  = '#ff6600';
@@ -1513,7 +1513,7 @@ function renderFrame() {
   const bowKit  = getBowlKit();
   // Keeper stands just behind the north stumps (bail at pTop+S*16)
   // Position feet ~S*10 north of stump bail = pTop + S*6
-  const pTop = CY - H*0.22;
+  const pTop = CY - H*0.28;
   const keeperY = pTop + S*4;  // just behind the top stumps bail
   drawKeeperSprite(CX, keeperY, batKit.helmet);
   // Non-striker (at far end) — drawn before striker so striker renders on top
@@ -1533,7 +1533,7 @@ function startLoop() {
 // ── Ball trajectory ──────────────────────────────────────────
 
 function animateBall(type, onDone) {
-  const CX=W/2, CY=H*.58, pTop=CY-H*.22, pBot=CY-H*.22+H*.44, pMid=(pTop+pBot)/2;
+  const CX=W/2, CY=H*.58, pTop=CY-H*.28, pBot=CY-H*.28+H*.56, pMid=(pTop+pBot)/2;
   const RX=W*0.46, RY=H*0.40;
   const boundaryRY = RY * 0.92;
   const standY     = H * 0.08;
@@ -1702,7 +1702,7 @@ function animateBall(type, onDone) {
 
 // ── Bowler run-up ────────────────────────────────────────────
 function bowlerRunup(onDelivery) {
-  const CX=W/2, CY=H*.58, pBot=CY-H*.22+H*.44;
+  const CX=W/2, CY=H*.58, pBot=CY-H*.28+H*.56;
   const type=currentBowlerType;
   const startDist=type==='fast'?S*130:type==='medium'?S*55:S*18;
   const startX=CX+S*18, startY=pBot+startDist;
@@ -1983,12 +1983,38 @@ function stopCrowdAmbience(){
 function crowdReact(event){
   if(!sndOn||!musicGainNode) return;
   const c=getAC(), t=c.currentTime;
-  const tgt  = event==='six'?0.48:event==='four'?0.40:event==='wicket'?0.38:event==='dot'?0.18:0.28;
-  const hold  = event==='six'?2.0:event==='four'?1.5:event==='wicket'?2.5:0.4;
+  const tgt  = event==='hatrick'?0.65:event==='milestone'?0.55:event==='six'?0.48:event==='four'?0.40:event==='wicket'?0.38:event==='dot'?0.18:0.28;
+  const hold  = event==='hatrick'?5.0:event==='milestone'?3.5:event==='six'?2.0:event==='four'?1.5:event==='wicket'?2.5:0.4;
   musicGainNode.gain.cancelScheduledValues(t);
   musicGainNode.gain.linearRampToValueAtTime(tgt, t+0.12);
   musicGainNode.gain.setValueAtTime(tgt, t+hold);
   musicGainNode.gain.linearRampToValueAtTime(0.28, t+hold+1.8);
+  // Hat-trick: play a dramatic brass fanfare
+  if (event==='hatrick') {
+    try {
+      [[220,0],[277,0.18],[330,0.36],[440,0.54],[550,0.72],[440,0.90],[550,1.1],[660,1.3]].forEach(([f,dl])=>{
+        const o=c.createOscillator(),g=c.createGain();o.type='sawtooth';o.frequency.value=f;
+        const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1800;
+        o.connect(lp);lp.connect(g);g.connect(c.destination);
+        g.gain.setValueAtTime(0,t+dl);g.gain.linearRampToValueAtTime(.35,t+dl+.06);g.gain.exponentialRampToValueAtTime(.001,t+dl+.55);
+        o.start(t+dl);o.stop(t+dl+.6);
+      });
+    } catch(e){}
+  }
+  // Milestone (50/100): sitar glissando run-up
+  if (event==='milestone') {
+    try {
+      [293,330,370,440,493,587,659,880].forEach((f,i)=>{
+        const o=c.createOscillator(),g=c.createGain();o.type='sawtooth';
+        const dl=i*0.07;
+        o.frequency.setValueAtTime(f,t+dl);
+        const lp=c.createBiquadFilter();lp.type='bandpass';lp.frequency.value=1200;lp.Q.value=3;
+        o.connect(lp);lp.connect(g);g.connect(c.destination);
+        g.gain.setValueAtTime(0,t+dl);g.gain.linearRampToValueAtTime(.28,t+dl+.04);g.gain.exponentialRampToValueAtTime(.001,t+dl+.4);
+        o.start(t+dl);o.stop(t+dl+.45);
+      });
+    } catch(e){}
+  }
 }
 function toggleSnd(){
   sndOn=!sndOn;
@@ -2058,7 +2084,7 @@ function snd(type){
 // ── Reset helpers (sprite system) ────────────────────────────
 function resetBowler() {
   bowlGen++;  // cancel any lingering bowler animations
-  const CX=W/2, CY=H*0.58, pBot=CY-H*0.22+H*0.44;
+  const CX=W/2, CY=H*0.58, pBot=CY-H*0.28+H*0.56;
   const dist = currentBowlerType==='fast'?S*130:currentBowlerType==='medium'?S*55:S*18;
   bowlerX = CX + S*18;
   bowlerY = pBot + dist;
@@ -2078,6 +2104,10 @@ let OVERS=20, WKTS=10;  // OVERS is set by menu selector
 // Bowler types cycle each over: fast, fast, medium, spin, fast, medium, ...
 const BOWLER_TYPES = ['fast','fast','medium','spin','fast','medium','spin','fast'];
 let G={}, toss='bat', pTeam='India', aTeam='Australia', locked=false;
+// ── Milestone trackers ────────────────────────────────────────
+let consecutiveBowlerWickets = 0;  // hat-trick counter
+let batsmanScore = 0;              // current batsman's runs
+let fiftyDone = false, hundredDone = false;  // per-batsman flags
 
 // ── Handedness (right-handed batsman by default) ─────────────
 let isLeftHanded = false;  // affects square-leg umpire side
@@ -2392,9 +2422,14 @@ function applyBall(res) {
     const howLabel = res.how==='caught'?'C':res.how==='runout'?'RO':res.how==='stumped'?'ST':res.how==='lbw'?'LBW':'W';
     addChip(howLabel, 'wkt');
     snd('wicket');
-    startFielderCelebration();  // all fielders celebrate
+    startFielderCelebration();
+    consecutiveBowlerWickets++;
+    // Reset batsman score for new batsman
+    batsmanScore = 0; fiftyDone = false; hundredDone = false;
   } else {
     G.runs += runs; G.balls++;
+    batsmanScore += runs;
+    consecutiveBowlerWickets = 0;  // break the streak on any non-wicket ball
     addChip(runs===0 ? '·' : String(runs), runs===0 ? 'dot' : runs===4 ? 'four' : runs===6 ? 'six' : 'run');
     if (type==='six') snd('six');
     else if (type==='four') snd('four');
@@ -2441,7 +2476,7 @@ function handleOverEnd(onDone) {
     <div style="font-family:'Rajdhani',sans-serif;font-size:${Math.max(11,W/54)}px;color:rgba(245,240,224,0.5);margin-top:8px;letter-spacing:1px;">Batsman changing ends…</div>`;
   wrap.appendChild(el);
   // Sprite walkout animation — batsman walks to other end
-  const CX=W/2, CY=H*0.58, pTop=CY-H*0.22, pBot=CY-H*0.22+H*0.44;
+  const CX=W/2, CY=H*0.58, pTop=CY-H*0.28, pBot=CY-H*0.28+H*0.56;
   const fromY = batsmanY;
   const toY   = fromY < CY ? pBot - S*38 : pTop + S*38;
   playAnim('bat', [{pose:'walkout',dur:220},{pose:'walkout',dur:220},{pose:'walkout',dur:220}], null);
@@ -2486,8 +2521,37 @@ function runAI() {
         };
         if (res.type === 'wkt') {
           stumpsFallen=true;
-          playAnim('bowl',[{pose:'celebJump',dur:200},{pose:'celebFist',dur:220},{pose:'idle',dur:200}],null);
-          setTimeout(() => { resetPositions(); setTimeout(proceed, 300); }, 1200);
+          if (consecutiveBowlerWickets >= 3) {
+            crowdReact('hatrick');
+            setC('🎩 HAT-TRICK! Three in a row!');
+            playAnim('bowl',[
+              {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+              {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+              {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+              {pose:'idle',dur:200}
+            ],null);
+            spawnParticles('six');
+            setTimeout(() => { resetPositions(); setTimeout(proceed, 300); }, 2400);
+          } else {
+            playAnim('bowl',[{pose:'celebJump',dur:200},{pose:'celebFist',dur:220},{pose:'idle',dur:200}],null);
+            setTimeout(() => { resetPositions(); setTimeout(proceed, 300); }, 1200);
+          }
+        } else if (res.runs >= 1 && res.type !== 'four' && res.type !== 'six') {
+          if (!hundredDone && batsmanScore >= 100) {
+            hundredDone = true; crowdReact('milestone');
+            setC('💯 AI scores a CENTURY!');
+            playBatsmanShot('celebrate',res,null);
+            setTimeout(proceed, 1500);
+          } else if (!fiftyDone && batsmanScore >= 50) {
+            fiftyDone = true; crowdReact('milestone');
+            setC('🏏 AI reaches FIFTY!');
+            playBatsmanShot('celebrate',res,null);
+            setTimeout(proceed, 1100);
+          } else if (isOverComplete()) {
+            handleOverEnd(() => { resetBowler(); batsmanPose='stance'; proceed(); });
+          } else {
+            setTimeout(proceed, 320);
+          }
         } else if (isOverComplete()) {
           handleOverEnd(() => { resetBowler(); batsmanPose='stance'; proceed(); });
         } else {
@@ -2515,11 +2579,42 @@ async function ps(shotType) {
   if (G._chaseWon) { locked=false; finishInn(); return; }
   if (res.type==='wkt') {
     stumpsFallen=true;
-    playAnim('bowl',[{pose:'celebJump',dur:200},{pose:'celebFist',dur:220},{pose:'idle',dur:180}],null);
-    await sleep(1100); resetPositions(); await sleep(300);
+    if (consecutiveBowlerWickets >= 3) {
+      // HAT-TRICK! Extended celebration
+      crowdReact('hatrick');
+      setC('🎩 HAT-TRICK! Incredible bowling!');
+      playAnim('bowl',[
+        {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+        {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+        {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+        {pose:'idle',dur:180}
+      ],null);
+      spawnParticles('six');
+      await sleep(2200);
+    } else {
+      playAnim('bowl',[{pose:'celebJump',dur:200},{pose:'celebFist',dur:220},{pose:'idle',dur:180}],null);
+      await sleep(1100);
+    }
+    resetPositions(); await sleep(300);
   } else if (res.type==='six'||res.type==='four') {
     playBatsmanShot('celebrate',res,null); await sleep(880);
   } else if (res.runs >= 1) {
+    // Check for batting milestones BEFORE running
+    const prev = batsmanScore - res.runs;
+    if (!hundredDone && batsmanScore >= 100) {
+      hundredDone = true;
+      crowdReact('milestone');
+      setC('💯 CENTURY! Magnificent hundred!');
+      playBatsmanShot('celebrate',res,null);
+      spawnParticles('six');
+      await sleep(1800);
+    } else if (!fiftyDone && batsmanScore >= 50) {
+      fiftyDone = true;
+      crowdReact('milestone');
+      setC('🏏 FIFTY! Brilliant half-century!');
+      playBatsmanShot('celebrate',res,null);
+      await sleep(1400);
+    }
     // Batsmen run between wickets
     await new Promise(r => animateRunning(res.runs, r));
   }
@@ -2553,11 +2648,40 @@ async function pb(ballType) {
   if (G._chaseWon) { locked=false; finishInn(); return; }
   if (res.type==='wkt') {
     stumpsFallen=true;
-    playAnim('bowl',[{pose:'celebJump',dur:200},{pose:'celebFist',dur:220},{pose:'idle',dur:180}],null);
-    await sleep(1100); resetPositions(); await sleep(300);
+    if (consecutiveBowlerWickets >= 3) {
+      // HAT-TRICK! Player bowling takes hat-trick
+      crowdReact('hatrick');
+      setC('🎩 HAT-TRICK! You\'re on fire!');
+      playAnim('bowl',[
+        {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+        {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+        {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+        {pose:'idle',dur:180}
+      ],null);
+      spawnParticles('six');
+      await sleep(2200);
+    } else {
+      playAnim('bowl',[{pose:'celebJump',dur:200},{pose:'celebFist',dur:220},{pose:'idle',dur:180}],null);
+      await sleep(1100);
+    }
+    resetPositions(); await sleep(300);
   } else if (res.type==='six'||res.type==='four') {
     await sleep(700);
   } else if (res.runs >= 1) {
+    // AI batsman milestone
+    if (!hundredDone && batsmanScore >= 100) {
+      hundredDone = true;
+      crowdReact('milestone');
+      setC('💯 AI scores a CENTURY! 100 runs!');
+      playBatsmanShot('celebrate',res,null);
+      await sleep(1400);
+    } else if (!fiftyDone && batsmanScore >= 50) {
+      fiftyDone = true;
+      crowdReact('milestone');
+      setC('🏏 AI reaches FIFTY!');
+      playBatsmanShot('celebrate',res,null);
+      await sleep(1000);
+    }
     await new Promise(r => animateRunning(res.runs, r));
   }
   // Fielder throw-back for sub-4 shots
@@ -2644,6 +2768,8 @@ function finishInn() {
     G.i1={runs:G.runs,wkts:G.wkts};
     G.target=G.runs+1;
     G.inn=2; G.runs=0; G.wkts=0; G.balls=0; G._chaseWon=false;
+    // Reset all milestone trackers for new innings
+    consecutiveBowlerWickets=0; batsmanScore=0; fiftyDone=false; hundredDone=false;
     setTimeout(() => {
       clearTrack(); updateSB(); updateLabels();
       document.getElementById('innPill').textContent='2ND INNINGS';
@@ -2786,6 +2912,222 @@ function goMenu() {
   sceneReady = false;
   showScreen('menu');
 }
+
+// ═══════════════════════════════════════════════════════════
+//  DEBUG / TEST PANEL  —  Ctrl+Shift+T to toggle
+//  Lets you trigger specific test cases without playing balls
+// ═══════════════════════════════════════════════════════════
+(function() {
+  // ── Inject panel CSS ──────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = `
+    #dbgPanel {
+      display:none; position:fixed; top:60px; right:12px; z-index:9999;
+      background:rgba(6,10,8,.97); border:1px solid rgba(240,192,64,.5);
+      border-radius:10px; padding:14px 16px; min-width:220px;
+      font-family:'Rajdhani',sans-serif; color:#f5f0e0;
+      box-shadow:0 8px 32px rgba(0,0,0,.7);
+    }
+    #dbgPanel.open { display:block; }
+    #dbgPanel h3 {
+      margin:0 0 10px; font-family:'Teko',sans-serif;
+      font-size:1.1rem; letter-spacing:3px; color:#ffd700;
+      border-bottom:1px solid rgba(240,192,64,.25); padding-bottom:6px;
+    }
+    #dbgPanel .dbg-section {
+      font-size:.72rem; color:rgba(240,192,64,.6);
+      letter-spacing:2px; margin:10px 0 5px; text-transform:uppercase;
+    }
+    #dbgPanel button.dt {
+      display:block; width:100%; margin:4px 0; padding:6px 10px;
+      background:rgba(240,192,64,.1); border:1px solid rgba(240,192,64,.35);
+      color:#f5f0e0; font-family:'Rajdhani',sans-serif; font-size:.9rem;
+      cursor:pointer; border-radius:5px; text-align:left; transition:background .15s;
+    }
+    #dbgPanel button.dt:hover { background:rgba(240,192,64,.25); }
+    #dbgPanel button.dt .tag {
+      float:right; font-size:.7rem; color:rgba(240,192,64,.55);
+      letter-spacing:1px; padding-top:1px;
+    }
+    #dbgPanel .dbg-status {
+      margin-top:10px; padding:6px 8px; background:rgba(0,0,0,.4);
+      border-radius:4px; font-size:.78rem; color:#4ade80; min-height:20px;
+      border-left:2px solid #4ade80;
+    }
+    #dbgPanel .dbg-close {
+      position:absolute; top:8px; right:10px; background:none;
+      border:none; color:rgba(240,192,64,.5); cursor:pointer;
+      font-size:1rem; padding:0;
+    }
+    #dbgBadge {
+      position:fixed; bottom:40px; right:14px; z-index:9998;
+      font-size:.6rem; color:rgba(240,192,64,.25); font-family:monospace;
+      pointer-events:none; letter-spacing:1px;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ── Inject panel HTML ─────────────────────────────────────
+  const panel = document.createElement('div');
+  panel.id = 'dbgPanel';
+  panel.innerHTML = `
+    <button class="dbg-close" onclick="document.getElementById('dbgPanel').classList.remove('open')">✕</button>
+    <h3>🧪 TEST PANEL</h3>
+
+    <div class="dbg-section">🎩 Hat-Trick Tests</div>
+    <button class="dt" onclick="dbgTest('hatrick_setup')">
+      Set up hat-trick (2 wkts already) <span class="tag">SETUP</span>
+    </button>
+    <button class="dt" onclick="dbgTest('hatrick_trigger')">
+      Fire hat-trick now (3rd wicket) <span class="tag">TRIGGER</span>
+    </button>
+    <button class="dt" onclick="dbgTest('hatrick_direct')">
+      Full hat-trick celebration directly <span class="tag">DEMO</span>
+    </button>
+
+    <div class="dbg-section">🏏 Batting Milestones</div>
+    <button class="dt" onclick="dbgTest('fifty_setup')">
+      Set batsman score to 48 <span class="tag">SETUP</span>
+    </button>
+    <button class="dt" onclick="dbgTest('hundred_setup')">
+      Set batsman score to 98 <span class="tag">SETUP</span>
+    </button>
+    <button class="dt" onclick="dbgTest('fifty_direct')">
+      Fire fifty celebration directly <span class="tag">DEMO</span>
+    </button>
+    <button class="dt" onclick="dbgTest('hundred_direct')">
+      Fire century celebration directly <span class="tag">DEMO</span>
+    </button>
+
+    <div class="dbg-section">🔧 State</div>
+    <button class="dt" onclick="dbgTest('status')">
+      Show current state <span class="tag">INFO</span>
+    </button>
+    <button class="dt" onclick="dbgTest('reset_milestones')">
+      Reset all milestone counters <span class="tag">RESET</span>
+    </button>
+
+    <div class="dbg-status" id="dbgStatus">Ready.</div>
+  `;
+  document.body.appendChild(panel);
+
+  // ── Badge hint ────────────────────────────────────────────
+  const badge = document.createElement('div');
+  badge.id = 'dbgBadge';
+  badge.textContent = '` (backtick) = test panel';
+  document.body.appendChild(badge);
+
+  // ── Keyboard shortcut ─────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === '`') {   // backtick ` — no browser conflict
+      e.preventDefault();
+      panel.classList.toggle('open');
+    }
+  });
+
+  // ── Test runner ───────────────────────────────────────────
+  window.dbgTest = function(testId) {
+    const log = t => { document.getElementById('dbgStatus').textContent = t; };
+    const needsGame = () => {
+      if (!sceneReady) { log('⚠ Start a match first!'); return true; }
+      return false;
+    };
+
+    switch (testId) {
+
+      // ── Hat-trick SETUP: set counter to 2 so next wicket triggers ──
+      case 'hatrick_setup':
+        if (needsGame()) break;
+        consecutiveBowlerWickets = 2;
+        log(`✓ consecutiveBowlerWickets = 2. Take one more wicket to trigger hat-trick!`);
+        break;
+
+      // ── Hat-trick TRIGGER: directly set counter to 3 and play the scene ──
+      case 'hatrick_trigger':
+        if (needsGame()) break;
+        consecutiveBowlerWickets = 3;
+        // Simulate a wicket result going through the celebration path
+        stumpsFallen = true;
+        crowdReact('hatrick');
+        setC('🎩 HAT-TRICK! Incredible bowling!');
+        playAnim('bowl',[
+          {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+          {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+          {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+          {pose:'idle',dur:180}
+        ], null);
+        spawnParticles('six');
+        log('✓ Hat-trick triggered! Watch the bowler celebrate.');
+        break;
+
+      // ── Hat-trick DEMO: play celebration without touching game state ──
+      case 'hatrick_direct':
+        if (needsGame()) break;
+        crowdReact('hatrick');
+        setC('🎩 HAT-TRICK! Incredible bowling!');
+        playAnim('bowl',[
+          {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+          {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+          {pose:'celebJump',dur:200},{pose:'celebFist',dur:220},
+          {pose:'idle',dur:180}
+        ], null);
+        spawnParticles('six');
+        log('✓ Hat-trick demo playing. Music + fanfare + particles active.');
+        break;
+
+      // ── Fifty SETUP: set score so next 2 runs will trigger ──
+      case 'fifty_setup':
+        if (needsGame()) break;
+        batsmanScore = 48;
+        fiftyDone = false;
+        log('✓ batsmanScore = 48. Score 2+ runs to trigger fifty celebration.');
+        break;
+
+      // ── Hundred SETUP ──
+      case 'hundred_setup':
+        if (needsGame()) break;
+        batsmanScore = 98;
+        hundredDone = false; fiftyDone = true;  // skip fifty on the way
+        log('✓ batsmanScore = 98. Score 2+ runs to trigger century celebration.');
+        break;
+
+      // ── Fifty DEMO: play celebration directly ──
+      case 'fifty_direct':
+        if (needsGame()) break;
+        crowdReact('milestone');
+        setC('🏏 FIFTY! Brilliant half-century!');
+        playBatsmanShot('celebrate', {runs:2, type:'run'}, null);
+        log('✓ Fifty celebration demo playing. Sitar glissando + bat raise.');
+        break;
+
+      // ── Century DEMO ──
+      case 'hundred_direct':
+        if (needsGame()) break;
+        crowdReact('milestone');
+        setC('💯 CENTURY! Magnificent hundred!');
+        playBatsmanShot('celebrate', {runs:2, type:'run'}, null);
+        spawnParticles('six');
+        log('✓ Century celebration demo playing. Particles + music swell.');
+        break;
+
+      // ── Status readout ──
+      case 'status':
+        log(`wkts:${consecutiveBowlerWickets} | batScore:${batsmanScore} | 50:${fiftyDone} | 100:${hundredDone} | balls:${G.balls||0} | inn:${G.inn||'-'}`);
+        break;
+
+      // ── Reset ──
+      case 'reset_milestones':
+        consecutiveBowlerWickets = 0;
+        batsmanScore = 0; fiftyDone = false; hundredDone = false;
+        log('✓ All milestone counters reset to zero.');
+        break;
+
+      default:
+        log('Unknown test: ' + testId);
+    }
+  };
+})();
+
 </script>
 </body>
 </html>
